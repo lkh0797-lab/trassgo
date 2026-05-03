@@ -1,0 +1,41 @@
+# 관세청 수출입통계 트래커 설정
+
+api:
+  customs_endpoint_sigungu: https://apis.data.go.kr/1220000/sigunguperprlstperacrs/getSigunguPerPrlstPerAcrs
+  customs_endpoint_country: https://apis.data.go.kr/1220000/nitemtrade/getNitemtradeList
+  request_timeout_sec: 30
+  retry_count: 3
+  retry_delay_sec: 5
+  batch_months: 12       # 1회 호출당 최대 12개월
+  inter_call_delay_sec: 0.5
+
+data:
+  history_months: 60     # 5년치 누적 보관
+  fetch_months: 36       # 매 갱신 시 fetch 범위
+  cache_days: 90         # raw 캐시 유효기간
+  universe_file: 개별종목_시총1500억이상_TOP500_20260503.xlsx
+
+signals:
+  momentum:
+    yoy_threshold: 0.30           # +30%
+    consecutive_positive_months: 3
+  breakout:
+    lookback_months: 24           # 24개월 최고치 갱신
+  warn:
+    yoy_threshold: -0.25          # -25%
+    consecutive_negative_months: 3
+
+telegram:
+  enabled: false                  # B-5에서 true로 변경
+  push_immediate: [MOMENTUM, BREAKOUT]
+  push_summary: [WARN]
+
+output:
+  filename_template: 수출입통계_트래커_{yyyymm}.xlsx
+  font: 맑은 고딕
+  primary_color: '1F3864'         # NAVY
+  accent_color: 'C00000'
+
+logging:
+  level: INFO
+  retention_days: 30
