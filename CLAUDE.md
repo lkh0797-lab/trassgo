@@ -18,6 +18,10 @@ python -m src.add_stock --code 042700 --name 한미반도체 --hs 848620 --hs-de
 # 종목 추가 (대화형)
 scripts\add_stock.bat
 
+# 시군구 자동 디스커버리 (종목명+HS → 유력 시군구 Top-N 자동 추정)
+python -m src.discover_sgg --code 066970 --name 엘앤에프 --hs 284190 --hs-desc "양극재"
+python -m src.discover_sgg --code 066970 --name 엘앤에프 --hs 284190 --auto-top 1   # 비대화형
+
 # HS코드 후보 검증 스크립트 실행 예시
 python verify_candidates3.py
 
@@ -49,6 +53,7 @@ python -m src.mapper
 | `signals.py` | `compute_all_signals()` | MOMENTUM/BREAKOUT/WARN 시그널 산출. 임계값은 settings.yaml |
 | `dashboard.py` | `build_dashboard()` | 엑셀 생성. 시트: Summary, {종목}_상세, Universe, HS_Mapping, README |
 | `add_stock.py` | `probe_data()` / `add_stock()` | 신규 매핑 전 API 검증 → stock_mapping.csv append |
+| `discover_sgg.py` | `discover_sgg()` | 17개 시도 전부 probe → 시군구별 ranking → Top-N 자동 매핑 추가 |
 
 ### 데이터 흐름
 
@@ -59,7 +64,7 @@ python -m src.mapper
 
 ## 핵심 제약사항 / 함정
 
-- **전북특별자치도 시도 코드는 반드시 `52`** (구 전라북도 코드 `45`는 API 오류 99 반환)
+- **전북특별자치도 시도 코드는 반드시 `52`** (구 전라북도 코드 `45`는 API 오류 99 반환 — `config/sido_codes.csv`에서 제외됨)
 - **API 파라미터 대소문자**: `HsSgn` (대문자 H), `sidoCd`, `strtYymm`, `endYymm` — 변경 시 API error 99
 - **Windows 콘솔 한글**: 스크립트 진입점 최상단에 `sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')` 필수
 - **엑셀 PermissionError**: Excel에서 파일 열려있으면 저장 실패 → `build_dashboard()`에서 타임스탬프 suffix로 fallback 처리됨
